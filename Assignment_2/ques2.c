@@ -1,93 +1,140 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <limits.h>
 
-int adj[1000][1000];
-int graph[1000][1000];
-int v; int e;
+int n,m;
+int a[1000][1000] = {0};
+int vis[1000] = {0};
+int dis[1000][1000] = {0};
+int q[1000];
+int r = 0;
+int f = 0;
+int c = 0;
+int max = 0;
+int path[1000] = {0};
 
-int main()
+void init()
 {
-	scanf("%d %d",&v,&e);
-	for(int i=0; i<v; i++)
+	for(int i=0; i<n; i++)
 	{
-		for(int j=0; j<v; j++)
+		for(int j = 0; j<n; j++)
 		{
-			scanf("%d ",&adj[i][j]);
+			vis[i] = 0;
+			q[i] = 0;
 		}
 	}
-	for(int i=0; i<v; i++)
+	f = 0;
+	r = 0;
+}
+
+void dfs(int i, int end, int c)
+{
+	vis[i] = 1;
+	path[c] = i;
+
+	if(c == max && path[c] == end)
 	{
-		for(int j=0; j<v; j++)
+		for(int j=0; j<=c; j++)
+			printf("%d ",path[j]);
+		printf("\n");
+	}
+
+	for(int j=0; j<n; j++)
+	{
+		if(a[i][j] == 1 && vis[j] == 0)
+		{			
+			dfs(j, end, c+1);
+		}
+	}
+	vis[i] = 0;
+}
+
+void push(int val)
+{
+	q[r++] = val;
+}
+
+int pop()
+{
+	return q[f++];
+}
+
+void bfs(int row, int val)
+{
+	vis[val] = 1;
+	push(val);
+
+	int i;
+	while(f<r)
+	{
+		i = pop();
+		for(int j=0; j<n; j++)
 		{
-			if(adj[i][j]!=1)
-				graph[i][j]= INT_MAX;
-			else
-				graph[i][j]=adj[i][j];
+			if(a[i][j] == 1 && vis[j] == 0)
+			{
+				push(j);
+				vis[j] = 1;
+				dis[row][j] = dis[row][i]+1;
+			}
+		}
+	}
+	for(int j=0; j<n; j++)
+	{
+		if(dis[row][j] > max)
+		{
+			max = dis[row][j];
 		}
 	}
 
 }
-  
-// Solves the all-pairs shortest path problem using Floyd Warshall algorithm 
-void floydWarshall (int graph[1000][1000]) 
-{ 
-    /* dist[][] will be the output matrix that will finally have the shortest  
-      distances between every pair of vertices */
-    int dist[V][V], i, j, k; 
-  
-    /* Initialize the solution matrix same as input graph matrix. Or  
-       we can say the initial values of shortest distances are based 
-       on shortest paths considering no intermediate vertex. */
-    for (i = 0; i < V; i++) 
-        for (j = 0; j < V; j++) 
-            dist[i][j] = graph[i][j]; 
-  
-    /* Add all vertices one by one to the set of intermediate vertices. 
-      ---> Before start of an iteration, we have shortest distances between all 
-      pairs of vertices such that the shortest distances consider only the 
-      vertices in set {0, 1, 2, .. k-1} as intermediate vertices. 
-      ----> After the end of an iteration, vertex no. k is added to the set of 
-      intermediate vertices and the set becomes {0, 1, 2, .. k} */
-    for (k = 0; k < V; k++) 
-    { 
-        // Pick all vertices as source one by one 
-        for (i = 0; i < V; i++) 
-        { 
-            // Pick all vertices as destination for the 
-            // above picked source 
-            for (j = 0; j < V; j++) 
-            { 
-                // If vertex k is on the shortest path from 
-                // i to j, then update the value of dist[i][j] 
-                if (dist[i][k] + dist[k][j] < dist[i][j]) 
-                {
-                    dist[i][j] = dist[i][k] + dist[k][j]; 
 
-                }
-            } 
-        } 
-    } 
-  
-    // Print the shortest distance matrix 
-    printSolution(dist); 
-} 
-  
-/* A utility function to print solution */
-void printSolution(int dist[][V]) 
-{ 
-    printf ("The following matrix shows the shortest distances"
-            " between every pair of vertices \n"); 
-    for (int i = 0; i < V; i++) 
-    { 
-        for (int j = 0; j < V; j++) 
-        { 
-            if (dist[i][j] == INT_MAX) 
-                printf("%7s", "INF"); 
-            else
-                printf ("%7d", dist[i][j]); 
-        } 
-        printf("\n"); 
-    } 
-} 
+void printarr()
+{
+	for(int i=0; i<n; i++)
+	{
+		for(int j=0; j<n; j++)
+		{
+			printf("%d ", a[i][j]);
+		}
+		printf("\n");
+	}
+}
+
+int main()
+{
+	printf("Enter number of nodes: ");
+	scanf("%d", &n);
+	printf("Enter the number of edges: ");
+	scanf("%d", &m);
+
+	printf("Enter the adjacency matrix: \n");
+	for(int i=0; i<n; i++)
+	{
+		for(int j=0; j<n; j++)
+		{
+			scanf("%d", &a[i][j]);
+		}
+	}
+	//printarr();
+	printf("\n");
+
+	for(int i = 0; i<n; i++)
+	{
+		bfs(i, i);
+		init();
+	}
+	
+	printf("\nDiameter is : %d \n", max);
+
+	for(int i=0; i<n; i++)
+	{
+		for(int j=0; j<n; j++)
+		{
+			if(dis[i][j] == max)
+			{
+				dfs(i,j,0);
+				//init();
+			}
+		}
+	}
+	
+	return 0;
+}

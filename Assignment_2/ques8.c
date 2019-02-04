@@ -56,10 +56,10 @@ int bfs(int x)
 		int i;
 		for(i=0;i<v;i++)
 		{
-			if(adj[x][i]==1 && !visited[i])
+			if(adj[ele][i]==1 && !visited[i])
 			{
 				push(i);
-				level[i]=level[x]+1;
+				level[i]=level[ele]+1;
 				visited[i]=true;
 			}
 		}
